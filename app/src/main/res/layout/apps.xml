@@ -3,21 +3,20 @@
     android:id="@+id/main"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="@android:color/black"
     android:orientation="vertical" >
+
+    <CheckBox
+        android:id="@+id/navbarblack"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Force black navigation bar"
+        />
 
     <CheckBox
         android:id="@+id/statbarblack"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Status bar is also forced to black"
-        android:visibility="gone"
-        />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:singleLine="false"
-        android:text="Enable in your xposed manager and set which apps should get black navbars."
-        android:textSize="20sp"
+        android:text="Force black status bar"
         />
 </LinearLayout>

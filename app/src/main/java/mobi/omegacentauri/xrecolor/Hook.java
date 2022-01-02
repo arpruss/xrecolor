@@ -3,6 +3,7 @@ package mobi.omegacentauri.xrecolor;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.view.KeyEvent;
 import android.inputmethodservice.InputMethodService;
 import android.view.View;
@@ -31,9 +32,8 @@ public class Hook implements IXposedHookLoadPackage {
     public void handleLoadPackage(LoadPackageParam lpparam) throws Throwable {
         XSharedPreferences prefs = new XSharedPreferences(Main.class.getPackage().getName(), Main.PREFS);
 
-        final boolean blackStatusbar = false;
-        final boolean blackNavbar = true;
-        final String packageName = lpparam.packageName;
+        final boolean blackStatusbar = prefs.getBoolean(Main.PREF_STAT_BAR, false);
+        final boolean blackNavbar = prefs.getBoolean(Main.PREF_NAV_BAR, true);
 
         if (blackStatusbar) {
             findAndHookMethod("com.android.internal.policy.PhoneWindow", lpparam.classLoader,

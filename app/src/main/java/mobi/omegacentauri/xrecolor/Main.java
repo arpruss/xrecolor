@@ -15,15 +15,21 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+
+import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 
 public class Main extends Activity {
 	Resources res;
@@ -31,8 +37,7 @@ public class Main extends Activity {
 	static final String PREFS = "preferences";
 //	public static final String PREF_ENTER = "enter";
 	public static final String PREF_STAT_BAR = "statBar";
-	private CheckBox statBarBlack;
-
+    public static final String PREF_NAV_BAR = "navBar";
 
 	public static void saveIcon(Context c, String packageName) {
 		deleteIcon(c, packageName);
@@ -90,7 +95,7 @@ public class Main extends Activity {
         
         res = getResources();
 
-        statBarBlack = (CheckBox)findViewById(R.id.statbarblack);
+        CheckBox statBarBlack = (CheckBox) findViewById(R.id.statbarblack);
 		statBarBlack.setChecked(prefs.getBoolean(PREF_STAT_BAR, false));
 
 		statBarBlack.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -99,6 +104,21 @@ public class Main extends Activity {
 				prefs.edit().putBoolean(PREF_STAT_BAR, isChecked).apply();
 			}
 		});
+
+        CheckBox navBarBlack = (CheckBox)findViewById(R.id.navbarblack);
+        navBarBlack.setChecked(prefs.getBoolean(PREF_NAV_BAR, true));
+
+        navBarBlack.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                prefs.edit().putBoolean(PREF_NAV_BAR, isChecked).apply();
+            }
+        });
+
+        Window w = getWindow();
+        w.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+		w.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+		w.setNavigationBarColor(Color.BLACK);
 	}
 
 //    @Override
