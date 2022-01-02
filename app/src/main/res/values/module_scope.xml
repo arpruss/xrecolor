@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="module_scope">
+        <item>com.Bisha.TI89Emu</item>>
+        <item>mobi.omegacentauri.LibriVoxDownloader</item>>
+        <item>mobi.pruss.superdim</item>>
+        <item>com.azumio.android.instantheartrate.classic</item>>
+        <item>com.simulationcurriculum.skysafari5</item>>
+        <item>com.simulationcurriculum.skysafari5plus</item>>
+        <item>com.simulationcurriculum.skysafari5pro</item>>
     </string-array>
 </resources>

@@ -17,5 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:singleLine="false"
-        android:text="Enable in your xposed manager and set which apps should get black navbars."/>
+        android:text="Enable in your xposed manager and set which apps should get black navbars."
+        android:textSize="20sp"
+        />
 </LinearLayout>

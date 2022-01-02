@@ -25,57 +25,69 @@ import static android.view.WindowManager.*;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 
 public class Hook implements IXposedHookLoadPackage {
-	static InputMethodService ims = null;
+    static InputMethodService ims = null;
 
-	@Override
-	public void handleLoadPackage(LoadPackageParam lpparam) throws Throwable {
-		XSharedPreferences prefs = new XSharedPreferences(Main.class.getPackage().getName(), Main.PREFS);
-		Context systemContext = (Context) XposedHelpers.callMethod( XposedHelpers.callStaticMethod( XposedHelpers.findClass("android.app.ActivityThread", lpparam.classLoader), "currentActivityThread"), "getSystemContext" );
+    @Override
+    public void handleLoadPackage(LoadPackageParam lpparam) throws Throwable {
+        XSharedPreferences prefs = new XSharedPreferences(Main.class.getPackage().getName(), Main.PREFS);
 
-		final boolean blackStatusbar = false;
-		final boolean blackNavbar = true;
-		final String packageName = lpparam.packageName;
+        final boolean blackStatusbar = false;
+        final boolean blackNavbar = true;
+        final String packageName = lpparam.packageName;
 
-		if (blackStatusbar) {
-			findAndHookMethod("com.android.internal.policy.PhoneWindow", lpparam.classLoader,
-					"setStatusBarColor",
-					int.class,
-					new XC_MethodHook() {
-					@SuppressLint("InlinedApi")
-					protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+        if (blackStatusbar) {
+            findAndHookMethod("com.android.internal.policy.PhoneWindow", lpparam.classLoader,
+                    "setStatusBarColor",
+                    int.class,
+                    new XC_MethodHook() {
+                        @SuppressLint("InlinedApi")
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
 
-						XposedBridge.log("recoloring sb "+packageName);
+                            View decor = ((Window) param.thisObject).getDecorView();
+                            int suiv = decor.getSystemUiVisibility();
 
-					((Window)param.thisObject).addFlags(LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-					((Window)param.thisObject).clearFlags(LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                            if ((suiv & View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR) != 0) {
+                                decor.setSystemUiVisibility(suiv & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                            }
 
-					param.args[0] = Color.BLACK;
+                            ((Window) param.thisObject).addFlags(LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                            ((Window) param.thisObject).clearFlags(LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                            ((Window) param.thisObject).getDecorView().setSystemUiVisibility(((Window) param.thisObject).getDecorView().getSystemUiVisibility() & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-				}
-			});
-		}
-		if (blackNavbar) {
-			findAndHookMethod("com.android.internal.policy.PhoneWindow", lpparam.classLoader,
-					"setNavigationBarColor",
-					int.class,
-					new XC_MethodHook() {
-						@SuppressLint("InlinedApi")
-						protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-							param.args[0] = Color.BLACK;
-						}
-					});
-			findAndHookMethod("com.android.internal.policy.PhoneWindow", lpparam.classLoader,
-					"generateDecor",
-					int.class,
-					new XC_MethodHook() {
-						@SuppressLint("InlinedApi")
-						protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            param.args[0] = Color.BLACK;
 
-							((Window)param.thisObject).clearFlags(LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-							((Window)param.thisObject).addFlags(LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-							((Window)param.thisObject).setNavigationBarColor(Color.BLACK);
-						}
-					});
-		}
-	}
+                        }
+
+                    });
+        }
+        if (blackNavbar) {
+            findAndHookMethod("com.android.internal.policy.PhoneWindow", lpparam.classLoader,
+                    "setNavigationBarColor",
+                    int.class,
+                    new XC_MethodHook() {
+                        @SuppressLint("InlinedApi")
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            param.args[0] = Color.BLACK;
+                        }
+                    });
+            findAndHookMethod("com.android.internal.policy.PhoneWindow", lpparam.classLoader,
+                    "generateDecor",
+                    int.class,
+                    new XC_MethodHook() {
+
+                        @SuppressLint("InlinedApi")
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+
+                            ((Window) param.thisObject).clearFlags(LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+                            ((Window) param.thisObject).addFlags(LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                            ((Window) param.thisObject).setNavigationBarColor(Color.BLACK);
+                            View decor = (View) param.getResult();
+                            int suiv = decor.getSystemUiVisibility();
+                            if ((suiv & View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR) != 0) {
+                                decor.setSystemUiVisibility(suiv & ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+                            }
+                        }
+                    });
+        }
+    }
 }

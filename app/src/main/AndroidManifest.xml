@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mobi.omegacentauri.xrecolor">
 
-    <application android:label="xrecolor">
+    <application android:label="xblacknav">
         <meta-data
             android:name="xposedmodule"
             android:value="true" />
@@ -14,7 +14,7 @@
 
         <activity android:name=".Main"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:label="xrecolor"
+            android:label="xblacknav"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

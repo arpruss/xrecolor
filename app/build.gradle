@@ -4,7 +4,7 @@ android {
     compileSdkVersion 30
     defaultConfig {
         applicationId "mobi.omegacentauri.xrecolor"
-        minSdkVersion 13
+        minSdkVersion 21
         targetSdkVersion 23
         versionCode 1
         versionName "0.01"
