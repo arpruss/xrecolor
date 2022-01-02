@@ -6,8 +6,8 @@ android {
         applicationId "mobi.omegacentauri.xrecolor"
         minSdkVersion 13
         targetSdkVersion 23
-        versionCode 6
-        versionName "0.03"
+        versionCode 1
+        versionName "0.01"
     }
     buildTypes {
         release {

@@ -30,8 +30,8 @@ public class Main extends Activity {
 	SharedPreferences prefs;
 	static final String PREFS = "preferences";
 //	public static final String PREF_ENTER = "enter";
-	public static final String PREF_LEFT_RIGHT = "leftRight";
-	private CheckBox leftRight;
+	public static final String PREF_STAT_BAR = "statBar";
+	private CheckBox statBarBlack;
 
 
 	public static void saveIcon(Context c, String packageName) {
@@ -90,36 +90,15 @@ public class Main extends Activity {
         
         res = getResources();
 
-        leftRight = (CheckBox)findViewById(R.id.leftright);
-        leftRight.setChecked(prefs.getBoolean(PREF_LEFT_RIGHT, false));
+        statBarBlack = (CheckBox)findViewById(R.id.statbarblack);
+		statBarBlack.setChecked(prefs.getBoolean(PREF_STAT_BAR, false));
 
-		leftRight.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+		statBarBlack.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				prefs.edit().putBoolean(PREF_LEFT_RIGHT, isChecked).apply();
+				prefs.edit().putBoolean(PREF_STAT_BAR, isChecked).apply();
 			}
 		});
-	}
-
-	@SuppressLint("NewApi")
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		Intent i;
-		
-		switch(item.getItemId()) {
-//		case R.id.enter:
-//			boolean opt = ! prefs.getBoolean(PREF_ENTER, false);
-//			prefs.edit().putBoolean(PREF_ENTER, opt).commit();
-//			invalidateOptionsMenu();
-//			return true;
-		case R.id.leftright:
-			boolean opt = ! prefs.getBoolean(PREF_LEFT_RIGHT, false);
-			prefs.edit().putBoolean(PREF_LEFT_RIGHT, opt).commit();
-			invalidateOptionsMenu();
-			return true;
-		default:
-			return false;
-		}
 	}
 
 //    @Override
