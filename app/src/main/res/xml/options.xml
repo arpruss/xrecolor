@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:summary="Activate for the apps you are tweaking in your xposed manager."
+    >
+<CheckBoxPreference android:title="Force black status bar"
+    android:defaultValue="false"
+    android:key="statBar" />
+    <ListPreference android:title="Navigation bar"
+        android:key="navBarOptions"
+        android:entries="@array/navBarOptionNames"
+        android:entryValues="@array/navBarOptions"
+        android:defaultValue="black"
+        />
+</PreferenceScreen>

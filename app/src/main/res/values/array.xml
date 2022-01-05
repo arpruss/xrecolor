@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="navBarOptionNames">
+        <item>System default</item>
+        <item>Black</item>
+        <item>50% translucent</item>
+        <item>Match status bar</item>
+    </string-array>
+    <string-array name="navBarOptions">
+        <item>default</item>
+        <item>black</item>
+        <item>50</item>
+        <item>match</item>
+    </string-array>
+</resources>

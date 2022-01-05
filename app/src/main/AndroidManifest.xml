@@ -10,9 +10,13 @@
             android:value="Make nav bar black" />
         <meta-data
             android:name="xposedminversion"
-            android:value="93" />
+            android:value="89" />
+        <meta-data
+            android:name="xposedsharedprefs"
+        android:value="true"/>
+        <meta-data android:name="xposedscope" android:resource="@array/module_scope" />
 
-        <activity android:name=".Main"
+        <activity android:name=".Options"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:label="xblacknav"
             android:launchMode="singleTask">
