@@ -13,7 +13,9 @@ import android.view.WindowManager;
 public class Options extends PreferenceActivity {
     static final String PREFS = "preferences";
     public static final String PREF_STAT_BAR = "statBar";
+    public static final String PREF_FORCE_STAT_BAR = "forceStatBar";
     public static final String PREF_NAV_BAR = "navBarOptions";
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

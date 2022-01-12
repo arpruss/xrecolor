@@ -42,6 +42,7 @@ public class Hook implements IXposedHookLoadPackage {
 
         final boolean blackStatusbar = prefs.getBoolean(Options.PREF_STAT_BAR, false);
         final String navBar = prefs.getString(Options.PREF_NAV_BAR, "black");
+        final boolean forceStatusbar = prefs.getBoolean(Options.PREF_FORCE_STAT_BAR, false);
 
         if (blackStatusbar || navBar.equals("match")) {
             findAndHookMethod("com.android.internal.policy.PhoneWindow", lpparam.classLoader,
@@ -62,7 +63,7 @@ public class Hook implements IXposedHookLoadPackage {
                                 w.addFlags(LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                                 w.clearFlags(LayoutParams.FLAG_TRANSLUCENT_STATUS);
                                 w.getDecorView().setSystemUiVisibility(((Window) param.thisObject).getDecorView().getSystemUiVisibility() & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-                                param.args[0] = Color.BLACK;
+                                param.args[0] = Color.BLUE;
                             }
 
                             if (navBar.equals("match")) {
@@ -72,77 +73,84 @@ public class Hook implements IXposedHookLoadPackage {
                     });
         }
 
-        if (!navBar.equals("default")) {
-            findAndHookMethod("com.android.internal.policy.PhoneWindow", lpparam.classLoader,
-                    "setNavigationBarColor",
-                    int.class,
-                    new XC_MethodHook() {
-                        @SuppressLint("InlinedApi")
-                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                            param.args[0] = Color.BLACK;
-                        }
-                    });
+        if (forceStatusbar || !navBar.equals("default")) {
+            if (navBar.equals("50") || navBar.equals("black"))
+                findAndHookMethod("com.android.internal.policy.PhoneWindow", lpparam.classLoader,
+                        "setNavigationBarColor",
+                        int.class,
+                        new XC_MethodHook() {
+                            @SuppressLint("InlinedApi")
+                            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                                param.args[0] = navBar.equals("50") ? 0x80 << 24 : Color.BLACK;
+                            }
+                        });
+
             findAndHookMethod("com.android.internal.policy.PhoneWindow", lpparam.classLoader,
                     "generateDecor",
                     int.class,
                     new XC_MethodHook() {
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            if (forceStatusbar) {
+                                Window w = (Window) param.thisObject;
+
+                                w.clearFlags(LayoutParams.FLAG_FULLSCREEN);
+                                w.addFlags(LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+                            }
+                        }
 
                         @SuppressLint("InlinedApi")
                         protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                            boolean translucent;
-                            int color;
-                            boolean dark;
+                            if (!navBar.equals("default")) {
+                                boolean translucent;
+                                int color;
+                                boolean dark;
 
-                            Window w = (Window)param.thisObject;
+                                Window w = (Window) param.thisObject;
 
-                            if (navBar.equals("50")) {
-                                translucent = true;
-                                color = 0x80 << 24;
-                                dark = true;
-                            }
-                            else if (navBar.equals("black")) {
-                                translucent = false;
-                                color = Color.BLACK;
-                                dark = true;
-                            }
-                            else /* match */ {
-                                color = w.getStatusBarColor();
-                                translucent = (w.getAttributes().flags & LayoutParams.FLAG_TRANSLUCENT_STATUS) != 0;
-                                if (! translucent) {
-                                    if (Color.luminance(color) < 0.5) {
-                                        color = Color.BLACK;
+                                if (navBar.equals("50")) {
+                                    translucent = true;
+                                    color = 0x80 << 24;
+                                    dark = true;
+                                } else if (navBar.equals("black")) {
+                                    translucent = false;
+                                    color = Color.BLACK;
+                                    dark = true;
+                                } else /* match */ {
+                                    color = w.getStatusBarColor();
+                                    translucent = (w.getAttributes().flags & LayoutParams.FLAG_TRANSLUCENT_STATUS) != 0;
+                                    if (!translucent) {
+                                        if (Color.luminance(color) < 0.5) {
+                                            color = Color.BLACK;
+                                            dark = true;
+                                        } else {
+                                            color = Color.WHITE;
+                                            dark = false;
+                                        }
+                                    } else {
                                         dark = true;
                                     }
-                                    else {
-                                        color = Color.WHITE;
-                                        dark = false;
+                                }
+
+                                if (translucent) {
+                                    w.addFlags(LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+                                    w.addFlags(LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                                } else {
+                                    w.clearFlags(LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+                                    w.addFlags(LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                                }
+                                w.setNavigationBarColor(color);
+
+                                View decor = (View) param.getResult();
+                                int suiv = decor.getSystemUiVisibility();
+
+                                if (dark) {
+                                    if ((suiv & View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR) != 0) {
+                                        decor.setSystemUiVisibility(suiv & ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
                                     }
-                                }
-                                else {
-                                    dark = true;
-                                }
-                            }
-
-                            if (translucent) {
-                                w.addFlags(LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-                                w.addFlags(LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                            } else {
-                                w.clearFlags(LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-                                w.addFlags(LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                            }
-                            w.setNavigationBarColor(color);
-
-                            View decor = (View) param.getResult();
-                            int suiv = decor.getSystemUiVisibility();
-
-                            if (dark) {
-                                if ((suiv & View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR) != 0) {
-                                    decor.setSystemUiVisibility(suiv & ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
-                                }
-                            }
-                            else {
-                                if ((suiv & View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR) == 0) {
-                                    decor.setSystemUiVisibility(suiv | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+                                } else {
+                                    if ((suiv & View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR) == 0) {
+                                        decor.setSystemUiVisibility(suiv | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+                                    }
                                 }
                             }
                         }
